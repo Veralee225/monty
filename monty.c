@@ -1,58 +1,83 @@
 #include "monty.h"
-#define BUFSIZE 64
-
-char *operand;
+stack_t *head = NULL;
 
 /**
- * main - monty interpreter
- * @argc: int
+ * main - entry point
+ * @argc: arguments count
  * @argv: list of arguments
- * Return: nothing
+ * Return: always 0
  */
-int main(int argc, char const *argv[])
+
+int main(int argc, char *argv[])
 {
-	line_t *lines;
-	char **line;
-	int line_number;
-	stack_t *stack;
-	char *content;
-	void (*func)(stack_t**, unsigned int);
-
-	stack = NULL;
-
-	if (argc == 1)
+	if (argc != 2)
 	{
 		fprintf(stderr, "USAGE: monty file\n");
 		exit(EXIT_FAILURE);
 	}
-	lines = textfile_to_array(argv[1]);
-	if (lines == NULL)
-		return (0);
-
-	line_number = 0;
-	while ((lines + line_number)->content != NULL)
-	{
-		content = (lines + line_number)->content;
-		line = split_line(content);
-		operand = line[1];
-
-		func = get_op_func(line[0]);
-		if (func == NULL)
-		{
-			/*TODO: Refactor: Edit more efifcient way to free memory on exit*/
-			fprintf(stderr, "L%d: unknown instruction %s\n", line_number + 1, line[0]);
-			free(line);
-			free_stack(stack);
-			free_lines(lines);
-			exit(EXIT_FAILURE);
-		}
-
-		func(&stack, line_number + 1);
-		free(line);
-		line_number++;
-	}
-
-	free_stack(stack);
-	free_lines(lines);
+	open_file(argv[1]);
+	free_nodes();
 	return (0);
+}
+
+/**
+ * create_node - Creates a node.
+ * @n: Number to go inside the node.
+ * Return: Upon sucess a pointer to the node. Otherwise NULL.
+ */
+stack_t *create_node(int n)
+{
+	stack_t *node;
+
+	node = malloc(sizeof(stack_t));
+	if (node == NULL)
+		err(4);
+	node->next = NULL;
+	node->prev = NULL;
+	node->n = n;
+	return (node);
+}
+
+/**
+ * free_nodes - Frees nodes in the stack.
+ */
+void free_nodes(void)
+{
+	stack_t *tmp;
+
+	if (head == NULL)
+		return;
+
+	while (head != NULL)
+	{
+		tmp = head;
+		head = head->next;
+		free(tmp);
+	}
+}
+
+
+/**
+ * add_to_queue - Adds a node to the queue.
+ * @new_node: Pointer to the new node.
+ * @ln: line number of the opcode.
+ */
+void add_to_queue(stack_t **new_node, __attribute__((unused))unsigned int ln)
+{
+	stack_t *tmp;
+
+	if (new_node == NULL || *new_node == NULL)
+		exit(EXIT_FAILURE);
+	if (head == NULL)
+	{
+		head = *new_node;
+		return;
+	}
+	tmp = head;
+	while (tmp->next != NULL)
+		tmp = tmp->next;
+
+	tmp->next = *new_node;
+	(*new_node)->prev = tmp;
+
 }

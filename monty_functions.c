@@ -1,80 +1,76 @@
-#include "monty.h"
+include "monty.h"
+
 
 /**
- * op_push - adds elements to a stack
- * @stack: pointer to the first node/element in a stack
- * @line_number: the line within the stuck
- * Return: nothing
+ * add_to_stack - Adds a node to the stack.
+ * @new_node: Pointer to the new node.
+ * @ln: Interger representing the line number of of the opcode.
  */
-void op_push(stack_t **stack, unsigned int line_number)
+void add_to_stack(stack_t **new_node, __attribute__((unused))unsigned int ln)
 {
-	stack_t *new;
-	int n;
+	stack_t *tmp;
 
+	if (new_node == NULL || *new_node == NULL)
+		exit(EXIT_FAILURE);
+	if (head == NULL)
+	{
+		head = *new_node;
+		return;
+	}
+	tmp = head;
+	head = *new_node;
+	head->next = tmp;
+	tmp->prev = head;
+}
+
+
+/**
+ * print_stack - Adds a node to the stack.
+ * @stack: Pointer to a pointer pointing to top node of the stack.
+ * @line_number: line number of  the opcode.
+ */
+void print_stack(stack_t **stack, unsigned int line_number)
+{
+	stack_t *tmp;
+
+	(void) line_number;
 	if (stack == NULL)
-	{
-		fprintf(stderr, "L%d: stack not found\n", line_number);
 		exit(EXIT_FAILURE);
-	}
-
-	if (operand == NULL || _atoi(operand, &n) == -1)
+	tmp = *stack;
+	while (tmp != NULL)
 	{
-		fprintf(stderr, "L%d: usage: push integer\n", line_number);
-		exit(EXIT_FAILURE);
-	}
-
-	new = malloc(sizeof(stack_t));
-
-	if (new == NULL)
-	{
-		fprintf(stderr, "Error: malloc failed\n");
-		free(*stack);
-		exit(EXIT_FAILURE);
-	}
-
-	new->next = *stack;
-	new->prev = NULL;
-	new->n = n;
-
-	if (*stack)
-		(*stack)->prev = new;
-	*stack = new;
-}
-
-/**
- *op_pall - prints the data of all nodes in a stack
- *@stack: pointer to the head node pointer
- *@line_number: the line number
- *Return: void
- */
-void op_pall(stack_t **stack, unsigned int line_number)
-{
-	stack_t *temp;
-	(void)line_number;
-	temp = *stack;
-	while (temp)
-	{
-		printf("%d\n", temp->n);
-		temp = temp->next;
+		printf("%d\n", tmp->n);
+		tmp = tmp->next;
 	}
 }
 
 /**
- *op_pint -  prints the value at the top of the stack, followed by a new line
- *@stack: pointer to the head node pointer
- *@line_number: the line number
- *Return: void
+ * pop_top - Adds a node to the stack.
+ * @stack: Pointer to a pointer pointing to top node of the stack.
+ * @line_number: Interger representing the line number of of the opcode.
  */
-void op_pint(stack_t **stack, unsigned int line_number)
+void pop_top(stack_t **stack, unsigned int line_number)
 {
-	stack_t *temp;
-	(void)line_number;
-	if (*stack == NULL)
-	{
-		fprintf(stderr, "L%d: can't pint, stack empty\n", line_number);
-		exit(EXIT_FAILURE);
-	}
+	stack_t *tmp;
 
-	temp = *stack;
-	printf("%d\n", temp->n);
+	if (stack == NULL || *stack == NULL)
+		more_err(7, line_number);
+
+	tmp = *stack;
+	*stack = tmp->next;
+	if (*stack != NULL)
+		(*stack)->prev = NULL;
+	free(tmp);
+}
+
+/**
+ * print_top - Prints the top node of the stack.
+ * @stack: Pointer to a pointer pointing to top node of the stack.
+ * @line_number: Interger representing the line number of of the opcode.
+ */
+void print_top(stack_t **stack, unsigned int line_number)
+{
+	if (stack == NULL || *stack == NULL)
+		more_err(6, line_number);
+	printf("%d\n", (*stack)->n);
 }
