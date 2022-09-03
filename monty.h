@@ -82,5 +82,3 @@ void string_err(int error_code, ...);
 void rotr(stack_t **, unsigned int);
 
 #endif
-© 2022 GitHub, Inc.
-Terms
